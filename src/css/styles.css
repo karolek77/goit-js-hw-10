@@ -1,0 +1,29 @@
+.cat-info {
+  margin-top: 12px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.cat-img {
+  max-width: 300px;
+  height: auto;
+}
+.text-bold {
+  font-weight: bold;
+}
+.cat-text {
+  width: 40%;
+  vertical-align: top;
+}
+.cat-name {
+  margin: 0;
+}
+
+.loader {
+  display: none;
+}
+
+.error {
+  display: none;
+}
