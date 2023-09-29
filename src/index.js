@@ -1,13 +1,14 @@
 import { fetchBreeds, fetchCatByBreed } from './cat-api';
+import SlimSelect from 'slim-select';
+import Notiflix from 'notiflix';
 
 const breedSelect = document.querySelector('.breed-select');
 const errorElement = document.querySelector('.error');
 
-//const loadInfo = document.querySelector('.loader');
-//const apiKey =
-//'live_8nXLD69ky6MH51nGc5mvPbjfOi98w4qyCcfPOoIFwqHLRKTTVCD9ryS7DrODa9D1';
+const loadInfo = document.querySelector('.loader');
 
-//breedSelect.addEventListener('change', function () {});
+const slimSelect = new SlimSelect('.breed-select');
+
 document.addEventListener('DOMContentLoaded', () => {
   fetchBreeds().then(breedOptions => {
     breedOptions.forEach(option => {
@@ -34,18 +35,24 @@ breedSelect.addEventListener('change', function () {
             <div class="cat-text">
                 <h2 class="cat-name">${cat.name}</h2>
                 <p class="cat-description">${cat.description}</p>    
-                <p class="cat-temp"><span class="text-bold">Temperament:</span>${cat.temperament}</p>
+                <p class="cat-temp"><span class="text-bold">Temperament: </span>${cat.temperament}</p>
             </div>
        
         `;
         const catInfoElement = document.querySelector('.cat-info');
         catInfoElement.innerHTML = catHtml;
       } else {
-        throw new Error('Brak danych o kocie.');
+        throw new Error('No cat information found');
       }
     })
     .catch(error => {
-      errorElement.style.display = 'block';
-      console.error('Błąd podczas pobierania danych o kocie:', error);
+      Notiflix.Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!' + error,
+        {
+          position: 'center-top',
+          timeout: 1500,
+        }
+      );
+      console.error('Error while fetching cat data', error);
     });
 });

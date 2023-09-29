@@ -1,16 +1,17 @@
 module.exports = { fetchBreeds, fetchCatByBreed };
+import SlimSelect from 'slim-select';
+import Notiflix from 'notiflix';
 
 const apiKey =
   'live_8nXLD69ky6MH51nGc5mvPbjfOi98w4qyCcfPOoIFwqHLRKTTVCD9ryS7DrODa9D1';
 const breedSelect = document.querySelector('.breed-select');
-const loadInfo = document.querySelector('.loader');
+const loadInfo = document.querySelector('.loader-container');
 const catInfoElement = document.querySelector('.cat-info');
-const errorElement = document.querySelector('.error');
 
 function fetchBreeds() {
-  loadInfo.classList.remove('loader');
-  //breedSelect.style.display = 'none';
-  breedSelect.setAttribute('hidden', true);
+  loadInfo.classList.remove('loader-container');
+  breedSelect.style.display = 'none';
+
   return fetch('https://api.thecatapi.com/v1/breeds', {
     headers: {
       'x-api-key': apiKey,
@@ -18,8 +19,10 @@ function fetchBreeds() {
   })
     .then(response => {
       if (!response.ok) {
-        throw new Error('Failed to retrieve cat brees data.');
+        throw new Error('Failed to retrieve cat breeds data.');
       }
+
+      breedSelect.style.display = 'block';
       return response.json();
     })
     .then(data => {
@@ -30,49 +33,51 @@ function fetchBreeds() {
 
       return breedOptions;
     })
-
     .catch(error => {
-      errorElement.style.display = 'block';
+      Notiflix.Notify.failure(
+        'Oops! Something went wrong! Try reloading the page!' + error,
+        {
+          position: 'center-top',
+          timeout: 1500,
+        }
+      );
       console.log('There was a problem with the fetch operation:', error);
-      breedSelect.style.display = 'none';
     })
     .finally(() => {
-      loadInfo.classList.add('loader');
-      //breedSelect.style.display = 'block';
-      breedSelect.removeAttribute('hidden');
+      loadInfo.classList.add('loader-container');
     });
 }
 
+new SlimSelect({
+  select: 'single',
+});
+
 function fetchCatByBreed(breedId) {
-  loadInfo.classList.remove('loader');
+  loadInfo.classList.remove('loader-container');
   breedSelect.setAttribute('disabled', true);
   catInfoElement.style.display = 'none';
-  //catInfoElement.setAttribute('hidden', true);
-  return (
-    fetch(`https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`, {
+
+  return fetch(
+    `https://api.thecatapi.com/v1/images/search?breed_ids=${breedId}`,
+    {
       headers: {
         'x-api-key': apiKey,
       },
+    }
+  )
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Failed to retrieve cat data.');
+      }
+      return response.json();
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to retrieve cat data.');
-        }
-        return response.json();
-      })
-      //.then(data => {
-      //  return data;
-      //})
-      .catch(error => {
-        //errorElement.style.display = 'block';
-        //breedSelect.style.display = 'none';
-        console.error('Error while fetching cat data:', error);
-      })
-      .finally(() => {
-        loadInfo.classList.add('loader');
-        breedSelect.removeAttribute('disabled');
-        catInfoElement.style.display = 'flex';
-        //catInfoElement.removeAttribute('hidden');
-      })
-  );
+
+    .catch(error => {
+      console.error('Error while fetching cat data:', error);
+    })
+    .finally(() => {
+      loadInfo.classList.add('loader-container');
+      breedSelect.removeAttribute('disabled');
+      catInfoElement.style.display = 'flex';
+    });
 }
